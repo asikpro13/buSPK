@@ -120,14 +120,19 @@ class MainApp(MDApp):
             on_press=self.zoom_in)
         btn_zoom_out = MDIconButton(
             icon="zoom_out.png",
-            pos_hint={'right': 1, 'top': .5},
+            pos_hint={'right': 1, 'top': .4},
             on_press=self.zoom_out)
+        self.btn_location = MDIconButton(
+            icon="location_on_false.png",
+            pos_hint={'right': 1, 'top': .18},
+            on_press=self.user_geolocation)
         self.screen = Builder.load_string(button_from)
         self.screen2 = Builder.load_string(button_to)
         self.screen3 = Builder.load_string(button_router)
 
         self.bl.add_widget(btn_zoom_in)
         self.bl.add_widget(btn_zoom_out)
+        self.bl.add_widget(self.btn_location)
         self.bl.add_widget(self.screen)
         self.bl.add_widget(self.screen2)
         self.bl.add_widget(self.screen3)
@@ -188,13 +193,19 @@ class MainApp(MDApp):
             self.path()
             toast('Маршрут от ' + str(self.screen.ids.From.text) + ' до ' + str(self.screen2.ids.To.text), 0.4)
 
-    def del_all_point(self):  # Удаление всех точек. Т.к. в модуле работы с картой нет метода для очистки маркеров, приходится собственноручно их сохранять и удалять
+    def del_all_point(self):  # Удаление всех точек. Т.к. в модуле работы с картой нет метода для очистки маркеров,
+        # приходится собственноручно их сохранять и удалять
         for point in [self.From_SP1_to_SP5_points, self.allSP_points]:
             for i in range(len(point)):
                 self.mapview.remove_marker(point[i])
 
-    def user_geolocation(self, *args, **kwargs):  # Обновляем местоположение пользователя
-        pass
+    def user_geolocation(self, *args):  # Обновляем местоположение пользователя
+        if self.gps.get_state() == 0:
+            self.gps.start()
+            self.btn_location.icon = 'location_on_true.png'
+        else:
+            self.gps.stop()
+            self.btn_location.icon = 'location_on_false.png'
 
 if __name__ == '__main__':
     app = MainApp()

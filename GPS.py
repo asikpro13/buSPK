@@ -6,6 +6,7 @@ from kivy.utils import platform
 class location:
     def __init__(self, map):
         self.mapview = map
+        self.state = 0
         request_permissions([Permission.ACCESS_COARSE_LOCATION,
                              Permission.ACCESS_FINE_LOCATION], callback)
         gps.configure(on_location=self.location,
@@ -21,6 +22,7 @@ class location:
         print(general, status)
 
     def start(self):
+        self.state = 1
         gps.start(1000, 0)
 
     def location(self):
@@ -32,5 +34,9 @@ class location:
             print(lat, lon)
 
     def stop(self):
+        self.state = 0
         self.mapview.remove_marker(self.my_geolocation_marker)
         gps.stop()
+
+    def get_state(self):
+        return 1 if self.state == 1 else 0
