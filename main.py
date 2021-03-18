@@ -20,6 +20,7 @@ from kivy.uix.widget import Widget
 from kivy.uix.modalview import ModalView
 from kivy.uix.gridlayout import GridLayout
 from kivy.core.window import Window
+
 try:
     from GPS import location
 except ModuleNotFoundError:
@@ -64,6 +65,7 @@ def path(From, to):
 
 class MainApp(MDApp):
     def __init__(self, **kwargs):  # Инициализация класса, тут объявляем все объекты и переменные
+
         self.From_SP1_to_SP5_points = [
             MapMarker(lat=61.272586, lon=73.411232, source="station_marker.png", on_press=toasts.toast_for_SP1),
             MapMarker(lat=61.271631, lon=73.413228, source="point.png"),
@@ -100,15 +102,28 @@ class MainApp(MDApp):
         self.theme_cls.primary_palette = "Indigo"
         self.bl = FloatLayout()
         self.bl.height += 100
-        try:
-            self.gps = location(self.mapview)
-        except NameError:
-            print('Если вы запускаете код с пк, то модуля геолокации не будет')
-        self.verify_geolocation = True
-
-    def build(self):  # Основной метод на котором основывается все приложение
         self.mapview = MapView(zoom=12, lat=61.254035, lon=73.396221, pos_hint={'top': 1}, size_hint=(None, None),
                                size=(Window.width, Window.height))
+        try:
+            self.gps = location(self.mapview)
+            print('Карта')
+        except NameError:
+            print('Если вы запускаете код с пк, то модуля геолокации не будет')
+
+    def build(self):  # Основной метод на котором основывается все приложение
+        def callback(permission, results):
+            if all([res for res in results]):
+                print(';sada')
+            else:
+                print('ВСЕ ПЛОХО')
+        try:
+            from android.permissions import Permission, request_permissions
+            request_permissions([Permission.ACCESS_FINE_LOCATION], callback)
+            gps.configure(on_location=self.user_geolocation,
+                          on_status=self.on_auth_status)
+        except ModuleNotFoundError:
+            print('С пк не работает т.к. при сборке используется python-for-android')
+
         self.allSP()
         self.mapview.map_source.min_zoom = 9
         self.mapviewLayout = BoxLayout()
@@ -125,7 +140,7 @@ class MainApp(MDApp):
         self.btn_location = MDIconButton(
             icon="location_on_false.png",
             pos_hint={'right': 1, 'top': .18},
-            on_press=self.user_geolocation)
+            on_press=self.set_state_geolocation)
         self.screen = Builder.load_string(button_from)
         self.screen2 = Builder.load_string(button_to)
         self.screen3 = Builder.load_string(button_router)
@@ -199,13 +214,30 @@ class MainApp(MDApp):
             for i in range(len(point)):
                 self.mapview.remove_marker(point[i])
 
-    def user_geolocation(self, *args):  # Обновляем местоположение пользователя
-        if self.gps.get_state() == 0:
-            self.gps.start()
-            self.btn_location.icon = 'location_on_true.png'
-        else:
-            self.gps.stop()
-            self.btn_location.icon = 'location_on_false.png'
+    def user_geolocation(self, **kwargs):  # Обновляем местоположение пользователя
+        self.lat = kwargs['lat']
+        self.lon = kwargs['lon']
+        self.gps.set_lat_lon(self.lat, self.lon)  # Меняем состояние координат
+        self.mapview.add_marker(MapMarker(lat=float(self.gps.get_lat_lon()[0]), lon=float(self.gps.get_lat_lon()[1]),
+                                          source="location.me"))  # Ставим маркер по координатам пользователя
+
+    def set_state_geolocation(self, *args):
+        try:
+            state = self.gps.set_state_geolocation()
+            if state:
+                gps.start(minTime=100, minDistance=0)
+                self.btn_location.icon = 'location_on_true.png'
+            elif not state:
+                self.btn_location.icon = 'location_on_false.png'
+                gps.stop()
+        except NotImplementedError:
+            pass
+
+    def on_auth_status(self, general, status):
+        print(general, status)
+
+
+
 
 if __name__ == '__main__':
     app = MainApp()

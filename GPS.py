@@ -1,42 +1,29 @@
-from android.permissions import Permission, request_permissions
-from plyer import gps
-from kivy.utils import platform
+try:
+    from plyer import gps
+    from kivy.utils import platform
+    from kivy_garden.mapview import MapMarker
 
+    class location:
+        def __init__(self, map):
+            self.mapview = map
+            self.state = 0
+            self.lat = 0
+            self.lon = 0
+            self.my_marker = 0
 
-class location:
-    def __init__(self, map):
-        self.mapview = map
-        self.state = 0
-        request_permissions([Permission.ACCESS_COARSE_LOCATION,
-                             Permission.ACCESS_FINE_LOCATION], callback)
-        gps.configure(on_location=self.location,
-                      on_status=self.on_auth_status)
+        def set_state_geolocation(self):
+            if self.state == 0:
+                self.state = True
+            else:
+                self.state = False
+            return self.state
 
-    def callback(self, permission, results):
-        if all([res for res in results]):
-            print(';sada')
-        else:
-            print('ВСЕ ПЛОХО')
+        def set_lat_lon(self, lat, lon):
+            self.lat = lat
+            self.lon = lon
 
-    def on_auth_status(self, general, status):
-        print(general, status)
+        def get_lat_lon(self):
+            return [self.lat, self.lon]
 
-    def start(self):
-        self.state = 1
-        gps.start(1000, 0)
-
-    def location(self):
-        if platform == 'android':
-            lat = kwargs['lat']
-            lon = kwargs['lon']
-            self.my_geolocation_marker = MapMarker(lat=float(lat), lon=float(lon), source="location_me.png")
-            self.mapview.add_marker(my_geolocation_marker)
-            print(lat, lon)
-
-    def stop(self):
-        self.state = 0
-        self.mapview.remove_marker(self.my_geolocation_marker)
-        gps.stop()
-
-    def get_state(self):
-        return 1 if self.state == 1 else 0
+except Exception as e:
+    print(e)
