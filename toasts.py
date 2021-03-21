@@ -44,3 +44,9 @@ class toasts:
     def toast_for_SP5(self, *args):
         date = sorted(schedule['SP5'], key=date_sort)
         toast('Ближайший автобус в ' + str(date[0]), 0.4)
+
+    def good_path(self, a, b):
+        toast('Маршрут от ' + str(a) + ' до ' + str(b), 0.4)
+
+    def bad_path(self):
+        toast("Некоректные данные для маршрута", 0.4)
