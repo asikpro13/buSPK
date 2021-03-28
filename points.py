@@ -2,7 +2,7 @@ from kivy_garden.mapview import MapMarker
 from toasts import toasts
 
 
-class paths:
+class paths:  # Класс для работы с маршрутами
     def __init__(self):
         self.toasts = toasts()
         self.From_SP1_to_SP5_points = [
@@ -205,7 +205,7 @@ class paths:
             self.From_SP1_to_SP4_points[-1]]
         # Маршрут от 4 до 5 сп
 
-    def get_list_points(self, a, b):
+    def get_list_points(self, a, b):  # Отдаем нужный маршрут
         if (a == '1 СП' and b == '5 СП') or (a == '5 СП' and b == '1 СП'):
             return self.From_SP1_to_SP5_points
         elif (a == '1 СП' and b == '4 СП') or (a == '4 СП' and b == '1 СП'):
@@ -227,7 +227,7 @@ class paths:
         elif (a == '4 СП' and b == '5 СП') or (a == '5 СП' and b == '4 СП'):
             return self.From_SP4_to_SP5_points
 
-    def get_allSP_points(self):
+    def get_allSP_points(self):  # Получить точки всех сп
         self.allSP_points = [
             # Маркер для СП1:
             MapMarker(lat=61.258720, lon=73.418079, source="station_marker.png", on_press=toasts.toast_for_SP1),
@@ -241,7 +241,7 @@ class paths:
             MapMarker(lat=61.272384, lon=73.413556, source="station_marker.png", on_press=toasts.toast_for_SP5)]
         return self.allSP_points
 
-    def get_all_points(self):
+    def get_all_points(self):  # Получить все точки
         return [self.From_SP1_to_SP5_points, self.From_SP1_to_SP4_points, self.From_SP1_to_SP3_points,
                       self.From_SP1_to_SP2_points, self.From_SP2_to_SP5_points, self.From_SP2_to_SP4_points,
                       self.From_SP2_to_SP3_points, self.allSP_points]

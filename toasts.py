@@ -1,6 +1,7 @@
 from kivymd.toast import toast
 import datetime
 import time
+# Работаем со временем
 
 schedule = {  # Расписание автобусов (какое Структурное Подразделение: Во сколько приедет)
             'SP1_OST': ['7:45', '8:35', '9:45', '11:05', '12:05', '13:40', '14:55', '15:05', '15:40', '16:20', '17:20',
@@ -24,8 +25,8 @@ def date_sort(date1):  # Сортируем ближайший автобус и
         return 99999999
 
 
-class toasts:
-    def toast_for_SP1(self, *args):  # Обработчик маркера автобуса
+class toasts:  # Наэкранные уведомления
+    def toast_for_SP1(self, *args):
         date = sorted(schedule['SP1_CENTER'] + schedule['SP1_OST'], key=date_sort)
         toast('Ближайший автобус в ' + str(date[0]), 0.4)
 
@@ -41,12 +42,12 @@ class toasts:
         date = sorted(schedule['SP4'], key=date_sort)
         toast('Ближайший автобус в ' + str(date[0]), 0.4)
 
-    def toast_for_SP5(self, *args):
+    def toast_for_SP5(self, *args):  # Уведомления для автобусов
         date = sorted(schedule['SP5'], key=date_sort)
         toast('Ближайший автобус в ' + str(date[0]), 0.4)
 
-    def good_path(self, a, b):
+    def good_path(self, a, b):  # Уведомление вызываемое при запросе адекватного маршрута
         toast('Маршрут от ' + str(a) + ' до ' + str(b), 0.4)
 
-    def bad_path(self):
+    def bad_path(self):  # Уведомление вызываемое при запросе неадекватного маршрута
         toast("Некоректные данные для маршрута", 0.4)

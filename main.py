@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
 import sys
-from plyer import gps
+from plyer import gps  # Объект геолокации для взаимодействия с телефоном
 from kivy.app import App
-from kivy.lang import Builder
-
 from kivymd.app import MDApp
+from kivy.lang import Builder
+# Технические внутренности
+
+
 from kivymd.uix.bottomsheet import MDGridBottomSheet
-from kivymd.toast import toast
-
-from kivymd_extensions.akivymd import *
+from kivymd.toast import toast  # Всплывающее уведомление
 from kivymd.uix.button import MDIconButton
-
 from kivy.uix.button import Button
 from kivymd.uix.list import OneLineListItem
 from kivy.uix.floatlayout import FloatLayout
@@ -20,10 +19,14 @@ from kivy.uix.widget import Widget
 from kivy.uix.modalview import ModalView
 from kivy.uix.gridlayout import GridLayout
 from kivy.core.window import Window
+# Карта, объекты стилей, разметка
 
 from points import paths
+
+#  Импорт класса с путями маршрутов
+
 try:
-    from GPS import location
+    from GPS import location  # Импорт класса для работы с геолокацией
 except ModuleNotFoundError:
     print('Если вы запускаете код с пк, то модуля геолокации не будет')
 from toasts import toasts
@@ -59,12 +62,7 @@ Screen:
         size: (150, 100)'''  # Кнопка для построения маршрута
 
 
-def path(From, to):
-    if From == '':
-        pass
-
-
-class MainApp(MDApp):
+class MainApp(MDApp):  # Главное окно
     def __init__(self, **kwargs):  # Инициализация класса, тут объявляем все объекты и переменные
         super().__init__(**kwargs)
         self.count = 0
@@ -90,6 +88,7 @@ class MainApp(MDApp):
                 print(';sada')
             else:
                 print('ВСЕ ПЛОХО')
+
         try:
             from android.permissions import Permission, request_permissions
             request_permissions([Permission.ACCESS_FINE_LOCATION], callback)
@@ -131,7 +130,7 @@ class MainApp(MDApp):
         for point in self.paths.get_allSP_points():
             self.mapview.add_marker(point)
 
-    def show_example_grid_bottom_sheet_from(self):
+    def show_example_grid_bottom_sheet_from(self):  # Нажатие на кнопку для открытия меню выбора автобуса
         bottom_sheet_menu = MDGridBottomSheet()
         data = {"1 СП": "bus_icon_126644.png",
                 "2 СП": "bus_icon_126644.png",
@@ -147,10 +146,9 @@ class MainApp(MDApp):
     def path(self, a, b):  # Прокладываем путь
         self.del_all_point()  # Удаляем все точки
         for point in self.paths.get_list_points(a, b):
-                self.mapview.add_marker(point)
+            self.mapview.add_marker(point)
 
-
-    def show_example_grid_bottom_sheet_to(self):
+    def show_example_grid_bottom_sheet_to(self):  # Нажатие на кнопку для открытия меню выбора автобуса
         bottom_sheet_menu = MDGridBottomSheet()
         data = {"1 СП": "bus_icon_126644.png",
                 "2 СП": "bus_icon_126644.png",
@@ -176,7 +174,7 @@ class MainApp(MDApp):
     def callback_to(self, *args):  # События для левой кнопки остановки
         self.screen2.ids.To.text = str(args[0])
 
-    def router(self):  # Функция для обработки маршрута и вывод оповещения
+    def router(self):  # Функция для вывода оповещения
         if str(self.screen.ids.From.text) == 'ОТ?' or str(self.screen2.ids.To.text) == 'ДО?':
             self.toasts.bad_path()
         elif str(self.screen.ids.From.text) == str(self.screen2.ids.To.text):
@@ -184,7 +182,7 @@ class MainApp(MDApp):
         else:
             self.path(str(self.screen.ids.From.text), str(self.screen2.ids.To.text))
             self.toasts.good_path(self.screen.ids.From.text, self.screen2.ids.To.text)
-            
+
     def del_all_point(self):  # Удаление всех точек. Т.к. в модуле работы с картой нет метода для очистки маркеров,
         # приходится собственноручно их сохранять и удалять
         for point in self.paths.get_all_points():
@@ -192,13 +190,15 @@ class MainApp(MDApp):
                 self.mapview.remove_marker(point[i])
 
     def user_geolocation(self, **kwargs):  # Обновляем местоположение пользователя
+        self.mapview.remove_marker(MapMarker(lat=float(self.gps.get_lat_lon()[0]), lon=float(self.gps.get_lat_lon()[1]),
+                                             source="location.me"))
         self.lat = kwargs['lat']
         self.lon = kwargs['lon']
         self.gps.set_lat_lon(self.lat, self.lon)  # Меняем состояние координат
         self.mapview.add_marker(MapMarker(lat=float(self.gps.get_lat_lon()[0]), lon=float(self.gps.get_lat_lon()[1]),
                                           source="location.me"))  # Ставим маркер по координатам пользователя
 
-    def set_state_geolocation(self, *args):
+    def set_state_geolocation(self, *args):  # Кнопка отслеживания местоположения(вкл/выкл)
         try:
             state = self.gps.set_state_geolocation()
             if state:
@@ -210,7 +210,7 @@ class MainApp(MDApp):
         except NotImplementedError:
             pass
 
-    def on_auth_status(self, general, status):
+    def on_auth_status(self, general, status):  # Событие критической ошибки
         print(general, status)
 
 
