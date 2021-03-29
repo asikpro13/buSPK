@@ -10,7 +10,7 @@ class location:  # Определение геолокации
         self.my_marker = 0
 
     def set_state_geolocation(self):
-        if self.state:  # Если True то получаем местоположение
+        if not self.state:  # Если True то получаем местоположение
             self.state = True
         else:
             self.state = False

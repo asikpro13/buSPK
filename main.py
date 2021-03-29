@@ -191,20 +191,21 @@ class MainApp(MDApp):  # Главное окно
 
     def user_geolocation(self, **kwargs):  # Обновляем местоположение пользователя
         self.mapview.remove_marker(MapMarker(lat=float(self.gps.get_lat_lon()[0]), lon=float(self.gps.get_lat_lon()[1]),
-                                             source="location.me"))
+                                             source="location_on_true.png"))
         self.lat = kwargs['lat']
         self.lon = kwargs['lon']
         self.gps.set_lat_lon(self.lat, self.lon)  # Меняем состояние координат
         self.mapview.add_marker(MapMarker(lat=float(self.gps.get_lat_lon()[0]), lon=float(self.gps.get_lat_lon()[1]),
-                                          source="location.me"))  # Ставим маркер по координатам пользователя
+                                          source="location_on_true.png"))  # Ставим маркер по координатам пользователя
 
     def set_state_geolocation(self, *args):  # Кнопка отслеживания местоположения(вкл/выкл)
         try:
+            print(self.gps.state)
             state = self.gps.set_state_geolocation()
-            if state:
+            if not state:
                 gps.start(minTime=100, minDistance=0)
                 self.btn_location.icon = 'location_on_true.png'
-            elif not state:
+            elif state:
                 self.btn_location.icon = 'location_on_false.png'
                 gps.stop()
         except NotImplementedError:
